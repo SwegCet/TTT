@@ -1,79 +1,99 @@
-//Print out Empty Gameboard in Console
-const gameBoard = [
-    ['', '', ''],
-    ['', '', ''],
-    ['', '', '']
-];
+//Store gameboard in a gameboard object
+const game = {
+    board: [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+    ]
+};
 
-console.log(gameBoard)
+//Update Board after every player action
+function updateBoard() {
+    console.log(game.board.map(row => row.join('|')).join('\n'));
+};
 
-//Now We need to update it after every player move
-function displayBoard() {
-    for (let row of gameBoard) {
-        console.log(row.join(' | '));
-        console.log('---------');
-    }
-}
-//Player Function
-function player(player, row, col) {
-    if (gameBoard[row][col] === '') {
-        gameBoard[row][col] = player;
+//Make Move/Player Function
+function makeMove(player, row, column) {
+    if (game.board[row][column] === '') {
+        game.board[row][column] = player;
         return true;
     }
     return false;
 }
-//Check Win
-function checkWin(player) {
-    // Check rows and columns
+
+//Check Win function
+function checkWin(currentPlayer) {
+    //Check rows
     for (let i = 0; i < 3; i++) {
-        if (gameBoard[i].every(cell => cell === player) ||
-            gameBoard.map(row => row[i]).every(cell => cell === player)) {
+        if (game.board[i][0] === currentPlayer && game.board[i][1] === currentPlayer && game.board[i][2] === currentPlayer) {
             return true;
         }
     }
-    // Check diagonals
-    if ([0, 1, 2].every(i => gameBoard[i][i] === player) ||
-        [0, 1, 2].every(i => gameBoard[i][2 - i] === player)) {
+
+    //Check columns
+    for (let j = 0; j < 3; j++) {
+        if (game.board[0][j] === currentPlayer && game.board[1][j] === currentPlayer && game.board[2][j] === currentPlayer) {
+            return true;
+        }
+    }
+
+    //Check Diagonal
+    if ((game.board[0][0] === currentPlayer && game.board[1][1] === currentPlayer && game.board[2][2] === currentPlayer) || (game.board[2][0] === currentPlayer && game.board[1][1] === currentPlayer && game.board[0][2] === currentPlayer)) {
         return true;
     }
+
     return false;
 }
 
+//Check Draw
 function checkDraw() {
-    return gameBoard.flat().every(cell => cell !== '');
+    //check if cells are filled
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (game.board[i][j] == '') {
+                return false; //we found an empty cell so it returns false
+            }
+        }
+    }
+    return true; //we found no empty cells
 }
 
-function checkDraw() {
-    return gameBoard.flat().every(cell => cell !== '');
-}
+//Game Start Function
+function gameStart() {
+    //Initial player is X
+    let player = 'X';
 
-//Game Function
-function playGame() {
-    let currentPlayer = 'X';
     while (true) {
-        //Display Board
-        displayBoard();
-        //Get player input
-        let row = parseInt(prompt(`Player ${currentPlayer}, enter row(0, 1, or2): `))
-        let col = parseInt(prompt(`Player ${currentPlayer}, enter col(0, 1, or2): `))
 
-        if (!player(currentPlayer, row, col)) {
+        //Display Board
+        updateBoard();
+
+        //Prompt user row and column
+        let row = parseInt(prompt(`Player ${player}, enter row 0, 1, or 2:`));
+        let col = parseInt(prompt(`Player ${player}, enter col 0, 1, or 2:`));
+
+        if (!makeMove(player, row, col)) {
             console.log('Invalid move, try again.');
             continue;
-        }
-        if (checkWin(currentPlayer)) {
-            displayBoard();
-            console.log(`Player ${currentPlayer} wins!`);
+        };
+        //If statement to check win
+        if (checkWin(player)) {
+            updateBoard();
+            console.log(`Player ${player} Wins!`);
             break;
         }
 
+        //If statement to check draw
         if (checkDraw()) {
-            displayBoard();
-            console.log('The game is a draw!');
+            updateBoard();
+            console.log(`It's a draw!`);
             break;
         }
 
-        currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
+        //Ternary Operator to Switch between the players
+        player = (player === 'X') ? 'O' : 'X';
     }
 }
-playGame()
+
+//call to start game
+gameStart();
