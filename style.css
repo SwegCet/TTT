@@ -8,6 +8,8 @@
     display: flex;
 }
 
+/*Make gameboard big and centered at the top*/
+
 .gameplay {
     display: flex;
     justify-content: space-between;
