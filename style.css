@@ -6,14 +6,30 @@
 
 .container {
     display: flex;
+    align-items: center;
+    flex-direction: column;
 }
 
 /*Make gameboard big and centered at the top*/
+.gameboard {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    margin: 10px;
+}
+
+.gameboard div {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+}
 
 .gameplay {
     display: flex;
-    justify-content: space-between;
-    padding: 10px;
+    justify-content: center;
+    align-items: center;
     gap: 10px;
 }
 
