@@ -4,7 +4,8 @@ const game = {
         ['', '', ''],
         ['', '', ''],
         ['', '', '']
-    ]
+    ],
+    currentPlayer: 'X'
 };
 
 //Update Board after every player action
@@ -16,37 +17,63 @@ function updateBoard() {
     //Create 9 cells for 3 x 3
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
-            const cell = document.createElement('cell');
+            const cell = document.createElement('div');
             cell.setAttribute('data-row', i);
             cell.setAttribute('data-column', j);
             //Populating array 
             cell.context = game.board[i][j];
-            //make cells clickable (addEventListener, click, call handleMove())
-            cell.addEventListener('click', handleMove())
             gameBoard.appendChild(cell);
+            //make cells clickable (addEventListener, click, call handleMove())
+            cell.addEventListener('click', handleMove)
+
         }
     }
-    //populate array after each click
-
-
     //console.log(game.board.map(row => row.join('|')).join('\n'));
 };
 
 //Create a handleMove function: I.E handleMove(event)
 //This function will handle the row and column logic
+function handleMove(event) {
+    const row = event.target.getAttribute('data-row');
+    const column = event.target.getAttribute('data-column');
+
+    //Only allow a move if there's an empty cell
+    if (game.board[row][column] === '') {
+        //call makeMove function 
+        makeMove(game.currentPlayer, row, column);
+    }
+};
 
 //Make Move/Player Function
 function makeMove(player, row, column) {
-    //Instead I think we could make, makeMove factory
-    //row and column can be an object 
+    //Mark the coordinate as a player option
+    game.board[row][column] = player;
 
-    if (game.board[row][column] === '') {
-        game.board[row][column] = player;
-        //update cell display here
-        return true;
+    //Update the cell display
+    const cell = document.querySelector(`[data-row="${row}"][data-column="${column}"]`)
+    cell.textContent = player;
+
+    //We check win conditions/Draw conditions here
+    if (checkWin(player)) {
+        alert(`${player} wins!`);
+        //Clear Board
+        resetGame();
     }
-    return false;
+    else if (checkDraw()) {
+        alert('Draw!');
+        //Clear Board
+        resetGame();
+    }
+    else {
+        //Call a switch function to switch players
+        switchPlayer();
+    }
 }
+
+function switchPlayer() {
+    //Ternary operator to switch the players
+    game.currentPlayer = (game.currentPlayer === 'X') ? 'O' : 'X';
+};
 
 //Check Win function
 function checkWin(currentPlayer) {
@@ -56,19 +83,16 @@ function checkWin(currentPlayer) {
             return true;
         }
     }
-
     //Check columns
     for (let j = 0; j < 3; j++) {
         if (game.board[0][j] === currentPlayer && game.board[1][j] === currentPlayer && game.board[2][j] === currentPlayer) {
             return true;
         }
     }
-
     //Check Diagonal
     if ((game.board[0][0] === currentPlayer && game.board[1][1] === currentPlayer && game.board[2][2] === currentPlayer) || (game.board[2][0] === currentPlayer && game.board[1][1] === currentPlayer && game.board[0][2] === currentPlayer)) {
         return true;
     }
-
     return false;
 }
 
@@ -85,56 +109,25 @@ function checkDraw() {
     return true; //we found no empty cells
 }
 
-//Here is where switch player will go for game
+//Here is resetting the gameboard
+function resetGame() {
+    game.board = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+    ];
+    game.currentPlayer = 'X';
+    updateBoard();
+}
 
 //Game Start Function
 function gameStart() {
-    //document.querySelector('#start').addEventListener('click', () => {
-    //const playerOneName = document.querySelector('.playerOne').value}
-    //const playerTwoName = document.querySelector('.playerTwo').value}
+    //We dont want it to loop infinitely
+    //Since we're doing UI, we can do it based off clicks
 
-    //Assigning player1 and player2
-    //const player1 = {name: playerOneName, symbol: 'X'};
-    //const player2 = {name: playerTwoName, symbol: 'O'};
+    //This will initialize the 3x3 gameboard
+    updateBoard();
 
-    //})
-
-    //Initial player is X
-    //let player = 'X';
-
-    while (true) {
-
-        //Display Board
-        updateBoard();
-
-        //Prompt user row and column
-        //comment this out since we're not using it anymore
-        //let row = parseInt(prompt(`Player ${player}, enter row 0, 1, or 2:`));
-        //let col = parseInt(prompt(`Player ${player}, enter col 0, 1, or 2:`));
-
-        if (!makeMove(player, row, col)) {
-            console.log('Invalid move, try again.');
-            continue;
-        };
-        //If statement to check win
-        if (checkWin(player)) {
-            updateBoard();
-            console.log(`Player ${player} Wins!`);
-            break;
-        }
-
-        //If statement to check draw
-        if (checkDraw()) {
-            updateBoard();
-            console.log(`It's a draw!`);
-            break;
-        }
-
-        //Ternary Operator to Switch between the players
-        //make this it's seperate function and call it
-        player = (player === 'X') ? 'O' : 'X';
-    }
+    //Rest of the functionality is from callbacks
 }
 
-//call to start game
-// gameStart();
